@@ -42,6 +42,16 @@ class VRIC(BaseImageDataset):
                 'camid': int(camid),
             }
 
+        path_query = self.dataset_dir + "/vric_probe.txt"
+        with open(path_query, 'r') as txt:
+            lines = txt.readlines()
+        for img_idx, img_info in enumerate(lines):
+            img_name, pid, camid = img_info.split(' ')
+            self.image_map[osp.basename(img_name)] = {
+                'pid': int(pid),
+                'camid': int(camid),
+            }
+
         path_test = self.dataset_dir + "/vric_gallery.txt"
         with open(path_test, 'r') as txt:
             lines = txt.readlines()
@@ -94,6 +104,7 @@ class VRIC(BaseImageDataset):
                 pid_container.add(pid)
             pid2label = {pid: label for label, pid in enumerate(pid_container)}
 
+        camid_container = set()
         dataset = []
         count = 0
         for img_path in img_paths:
@@ -104,11 +115,13 @@ class VRIC(BaseImageDataset):
             except:
                 count += 1
                 continue
+            camid_container.add(camid)
             if pid == -1: continue  # junk images are just ignored
-            # camid -= 1  # index starts from 0
+            camid -= 1  # index starts from 0
             if relabel: pid = pid2label[pid]
 
             dataset.append((img_path, pid, camid, 1))
         print(count, 'samples without annotations')
+        print('camid container', camid_container)
         return dataset
 
