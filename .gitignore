@@ -221,6 +221,5 @@ ENV/
 .ropeproject
 
 # Dataset
-VRIC/
 data/
 checkpoints/
