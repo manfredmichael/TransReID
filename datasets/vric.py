@@ -38,8 +38,8 @@ class VRIC(BaseImageDataset):
         for img_idx, img_info in enumerate(lines):
             img_name, pid, camid = img_info.split(' ')
             self.image_map[osp.basename(img_name)] = {
-                'pid': pid,
-                'camid': camid,
+                'pid': int(pid),
+                'camid': int(camid),
             }
 
         path_test = self.dataset_dir + "/vric_gallery.txt"
@@ -48,8 +48,8 @@ class VRIC(BaseImageDataset):
         for img_idx, img_info in enumerate(lines):
             img_name, pid, camid = img_info.split(' ')
             self.image_map[osp.basename(img_name)] = {
-                'pid': pid,
-                'camid': camid,
+                'pid': int(pid),
+                'camid': int(camid),
             }
 
         train = self._process_dir(self.train_dir, relabel=True)
