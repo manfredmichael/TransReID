@@ -13,12 +13,14 @@ import torch.distributed as dist
 from .occ_duke import OCC_DukeMTMCreID
 from .vehicleid import VehicleID
 from .veri import VeRi
+from .vric import VRIC
 __factory = {
     'market1501': Market1501,
     'dukemtmc': DukeMTMCreID,
     'msmt17': MSMT17,
     'occ_duke': OCC_DukeMTMCreID,
     'veri': VeRi,
+    'vric': VRIC,
     'VehicleID': VehicleID,
 }
 
