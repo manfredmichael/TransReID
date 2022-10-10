@@ -5,6 +5,10 @@ import copy
 from .backbones.vit_pytorch import vit_base_patch16_224_TransReID, vit_small_patch16_224_TransReID, deit_small_patch16_224_TransReID
 from loss.metric_learning import Arcface, Cosface, AMSoftmax, CircleLoss
 
+import pytorch_lightning as pl
+from solver import make_optimizer
+from loss import make_loss
+
 def shuffle_unit(features, shift, group, begin=1):
 
     batchsize = features.size(0)
@@ -212,7 +216,7 @@ class build_transformer(nn.Module):
         print('Loading pretrained model for finetuning from {}'.format(model_path))
 
 
-class build_transformer_local(nn.Module):
+class build_transformer_local(pl.LightningModule):
     def __init__(self, num_classes, camera_num, view_num, cfg, factory, rearrange):
         super(build_transformer_local, self).__init__()
         model_path = cfg.MODEL.PRETRAIN_PATH
@@ -221,6 +225,9 @@ class build_transformer_local(nn.Module):
         self.neck = cfg.MODEL.NECK
         self.neck_feat = cfg.TEST.NECK_FEAT
         self.in_planes = 768
+       
+        self.cfg = cfg
+        self.loss_func, self.center_criterion = make_loss(self.cfg, num_classes=num_classes)
 
         print('using Transformer_type: {} as a backbone'.format(cfg.MODEL.TRANSFORMER_TYPE))
 
@@ -369,6 +376,40 @@ class build_transformer_local(nn.Module):
             else:
                 return torch.cat(
                     [global_feat, local_feat_1 / 4, local_feat_2 / 4, local_feat_3 / 4, local_feat_4 / 4], dim=1)
+
+    def training_step(self, batch, batch_nb):
+        img, pid, target_cam, target_view = batch
+        # logger.info(f'n_iter {n_iter}')
+        # optimizer.zero_grad()
+        # optimizer_center.zero_grad()
+        # img = img.to(device)
+        # target = vid.to(device)
+        # target_cam = target_cam.to(device)
+        # target_view = target_view.to(device)
+
+        score, feat = self(img, pid, cam_label=target_cam, view_label=target_view)
+        loss = self.loss_func(score, feat, pid, target_cam)
+
+
+        if isinstance(score, list):
+            acc = (score[0].max(1)[1] == target).float().mean()
+        else:
+            acc = (score.max(1)[1] == target).float().mean()
+
+        # loss_meter.update(loss.item(), img.shape[0])
+        # acc_meter.update(acc, 1)
+
+        # torch.cuda.synchronize()
+        # if (n_iter + 1) % log_period == 0:
+        #     logger.info("Epoch[{}] Iteration[{}/{}] Loss: {:.3f}, Acc: {:.3f}, Base Lr: {:.2e}"
+        #                 .format(epoch, (n_iter + 1), len(train_loader),
+        #                         loss_meter.avg, acc_meter.avg, scheduler._get_lr(epoch)[0]))
+
+        return loss
+
+    def configure_optimizers(self):
+        optimizer, optimizer_center = make_optimizer(self.cfg, self, self.center_criterion)
+        return optimizer
 
     def load_param(self, trained_path):
         param_dict = torch.load(trained_path)
