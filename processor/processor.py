@@ -50,11 +50,8 @@ def do_train(cfg,
         scheduler.step(epoch)
         model.train()
         print('len', len(train_loader))
-        print(next(iter(train_loader)))
         n_iter = 0
         for n_iter, (img, vid, target_cam, target_view) in enumerate(train_loader):
-            print('test')
-            logger.info(f'n_iter {n_iter}')
             optimizer.zero_grad()
             optimizer_center.zero_grad()
             img = img.to(device)
