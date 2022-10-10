@@ -48,11 +48,11 @@ def do_train(cfg,
         acc_meter.reset()
         evaluator.reset()
         scheduler.step(epoch)
-        logger.info(f'activting train')
         model.train()
-        logger.info(f'activated train')
+        print(next(iter(train_loader)))
         n_iter = 0
         for n_iter, (img, vid, target_cam, target_view) in enumerate(train_loader):
+            print('test')
             logger.info(f'n_iter {n_iter}')
             optimizer.zero_grad()
             optimizer_center.zero_grad()
