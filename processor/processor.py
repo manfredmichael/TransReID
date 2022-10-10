@@ -22,13 +22,13 @@ def do_train(cfg,
     checkpoint_period = cfg.SOLVER.CHECKPOINT_PERIOD
     eval_period = cfg.SOLVER.EVAL_PERIOD
 
-    device = "cuda"
+    device = cfg.MODEL.DEVICE 
     epochs = cfg.SOLVER.MAX_EPOCHS
 
     logger = logging.getLogger("transreid.train")
     logger.info('start training')
     _LOCAL_PROCESS_GROUP = None
-    if device:
+    if device == 'cuda' :
         model.to(local_rank)
         if torch.cuda.device_count() > 1 and cfg.MODEL.DIST_TRAIN:
             print('Using {} GPUs for training'.format(torch.cuda.device_count()))
@@ -40,14 +40,20 @@ def do_train(cfg,
     evaluator = R1_mAP_eval(num_query, max_rank=50, feat_norm=cfg.TEST.FEAT_NORM)
     scaler = amp.GradScaler()
     # train
+    logger.info('start epoch')
     for epoch in range(1, epochs + 1):
+        logger.info(f'epoch {epoch}')
         start_time = time.time()
         loss_meter.reset()
         acc_meter.reset()
         evaluator.reset()
         scheduler.step(epoch)
+        logger.info(f'activting train')
         model.train()
+        print(next(iter(train_loader)))
+        logger.info(f'activated train')
         for n_iter, (img, vid, target_cam, target_view) in enumerate(train_loader):
+            logger.info(f'n_iter {n_iter}')
             optimizer.zero_grad()
             optimizer_center.zero_grad()
             img = img.to(device)
@@ -137,7 +143,7 @@ def do_inference(cfg,
                  model,
                  val_loader,
                  num_query):
-    device = "cuda"
+    device = cfg.MODEL.DEVICE 
     logger = logging.getLogger("transreid.test")
     logger.info("Enter inferencing")
 

@@ -93,7 +93,7 @@ class VRIC(BaseImageDataset):
             raise RuntimeError("'{}' is not available".format(self.gallery_dir))
 
     def _process_dir(self, dir_path, relabel=False):
-        img_paths = glob.glob(osp.join(dir_path, '*.jpg'))
+        img_paths = glob.glob(osp.join(dir_path, '*.jpg'))[:10]
 
         if relabel:
             pid_container = set()

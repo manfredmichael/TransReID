@@ -40,9 +40,9 @@ if __name__ == '__main__':
     cfg.freeze()
 
     set_seed(cfg.SOLVER.SEED)
-
-    if cfg.MODEL.DIST_TRAIN:
-        torch.cuda.set_device(args.local_rank)
+    if cfg.MODEL.USE_GPU:
+        if cfg.MODEL.DIST_TRAIN:
+            torch.cuda.set_device(args.local_rank)
 
     output_dir = cfg.OUTPUT_DIR
     if output_dir and not os.path.exists(output_dir):
@@ -83,5 +83,6 @@ if __name__ == '__main__':
         optimizer_center,
         scheduler,
         loss_func,
-        num_query, args.local_rank
+        num_query, 
+        args.local_rank
     )
