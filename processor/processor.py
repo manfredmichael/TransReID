@@ -51,6 +51,7 @@ def do_train(cfg,
         logger.info(f'activting train')
         model.train()
         logger.info(f'activated train')
+        n_iter = 0
         for n_iter, (img, vid, target_cam, target_view) in enumerate(train_loader):
             logger.info(f'n_iter {n_iter}')
             optimizer.zero_grad()
