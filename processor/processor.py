@@ -50,7 +50,6 @@ def do_train(cfg,
         scheduler.step(epoch)
         logger.info(f'activting train')
         model.train()
-        print(next(iter(train_loader)))
         logger.info(f'activated train')
         for n_iter, (img, vid, target_cam, target_view) in enumerate(train_loader):
             logger.info(f'n_iter {n_iter}')
