@@ -49,6 +49,7 @@ def do_train(cfg,
         evaluator.reset()
         scheduler.step(epoch)
         model.train()
+        print('len', len(train_loader))
         print(next(iter(train_loader)))
         n_iter = 0
         for n_iter, (img, vid, target_cam, target_view) in enumerate(train_loader):
