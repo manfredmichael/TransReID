@@ -1,6 +1,6 @@
 MODEL:
   PRETRAIN_CHOICE: 'imagenet'
-  PRETRAIN_PATH: 'checkpoints/deit_base_distilled_patch16_224.pth'
+  PRETRAIN_PATH: 'checkpoints/deit_base_distilled_patch16_224-df68dfff.pth'
   METRIC_LOSS_TYPE: 'triplet'
   IF_LABELSMOOTH: 'off'
   IF_WITH_CENTER: 'no'
