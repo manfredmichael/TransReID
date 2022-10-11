@@ -54,14 +54,14 @@ def do_train(cfg,
         logger.info('experiment loaded!')
 
 
-    params = config.get_model_hyperparameters(cfg)
-    mlflow.log_params(params)
-
-    mlflow.pytorch.log_model(model, cfg.MODEL.PRETRAIN_PATH)
-
     # train
     steps = 0
     with mlflow.start_run(experiment_id=experiment_id, nested=True):
+        params = config.get_model_hyperparameters(cfg)
+        mlflow.log_params(params)
+
+        mlflow.pytorch.log_model(model, cfg.MODEL.PRETRAIN_PATH)
+
         for epoch in range(1, epochs + 1):
             start_time = time.time()
             loss_meter.reset()
