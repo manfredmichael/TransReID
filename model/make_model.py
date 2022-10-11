@@ -5,8 +5,10 @@ import copy
 from .backbones.vit_pytorch import vit_base_patch16_224_TransReID, vit_small_patch16_224_TransReID, deit_small_patch16_224_TransReID
 from loss.metric_learning import Arcface, Cosface, AMSoftmax, CircleLoss
 
+import torch.distributed as dist
 import pytorch_lightning as pl
 from solver import make_optimizer
+from utils.metrics import R1_mAP_eval
 from loss import make_loss
 
 def shuffle_unit(features, shift, group, begin=1):
@@ -16,7 +18,7 @@ def shuffle_unit(features, shift, group, begin=1):
     # Shift Operation
     feature_random = torch.cat([features[:, begin-1+shift:], features[:, begin:begin-1+shift]], dim=1)
     x = feature_random
-    # Patch Shuffle Operation
+    # Patch 1huffle Operation
     try:
         x = x.view(batchsize, group, -1, dim)
     except:
@@ -228,6 +230,7 @@ class build_transformer_local(pl.LightningModule):
        
         self.cfg = cfg
         self.loss_func, self.center_criterion = make_loss(self.cfg, num_classes=num_classes)
+        self.evaluator = R1_mAP_eval(num_query, max_rank=50, feat_norm=cfg.TEST.FEAT_NORM)
 
         print('using Transformer_type: {} as a backbone'.format(cfg.MODEL.TRANSFORMER_TYPE))
 
@@ -392,9 +395,11 @@ class build_transformer_local(pl.LightningModule):
 
 
         if isinstance(score, list):
-            acc = (score[0].max(1)[1] == target).float().mean()
+            acc = (score[0].max(1)[1] == pid).float().mean()
         else:
-            acc = (score.max(1)[1] == target).float().mean()
+            acc = (score.max(1)[1] == pid).float().mean()
+
+        self.log("accuracy", acc, on_epoch=True)
 
         # loss_meter.update(loss.item(), img.shape[0])
         # acc_meter.update(acc, 1)
@@ -406,6 +411,17 @@ class build_transformer_local(pl.LightningModule):
         #                         loss_meter.avg, acc_meter.avg, scheduler._get_lr(epoch)[0]))
 
         return loss
+
+     def validation_step(self, batch, batch_idx):
+        if self.cfg.MODEL.DIST_TRAIN:
+            if dist.get_rank() != 0:
+                return
+        img, vid, camid, camids, target_view, _ = batch
+        feat = self(img, cam_label=camids, view_label=target_view)
+        self.evaluator.update((feat, vid, camid))
+        cmc, mAP, _, _, _, _, _ = self.evaluator.compute()
+        self.log("CMC", cmc)
+        self.log("mAP", mAP)
 
     def configure_optimizers(self):
         optimizer, optimizer_center = make_optimizer(self.cfg, self, self.center_criterion)
