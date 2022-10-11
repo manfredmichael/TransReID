@@ -1,14 +1,14 @@
 MODEL:
   PRETRAIN_CHOICE: 'imagenet'
-  # PRETRAIN_PATH: 'checkpoints/vit_small_p16_224-15ec54c9.pth'
-  PRETRAIN_PATH: 'checkpoints/deit_base_distilled_patch16_224-df68dfff.pth'
+  PRETRAIN_PATH: 'checkpoints/vit_small_p16_224-15ec54c9.pth'
+  # PRETRAIN_PATH: 'checkpoints/deit_base_distilled_patch16_224-df68dfff.pth'
   METRIC_LOSS_TYPE: 'triplet'
   IF_LABELSMOOTH: 'off'
   IF_WITH_CENTER: 'no'
   NAME: 'transformer'
   NO_MARGIN: True
   DEVICE_ID: ('4')
-  TRANSFORMER_TYPE: 'vit_base_patch16_224_TransReID'
+  TRANSFORMER_TYPE: 'vit_small_patch16_224_TransReID'
   STRIDE_SIZE: [16, 16]
   SIE_CAMERA: True
   SIE_VIEW: False 
@@ -16,7 +16,7 @@ MODEL:
   JPM: True
   SHIFT_NUM: 8
   RE_ARRANGE: True
-  EXPERIMENT_NAME: 'DEIT-BASE'
+  EXPERIMENT_NAME: 'VIT-SMALL-2'
 
 INPUT:
   SIZE_TRAIN: [256, 256]
@@ -36,9 +36,9 @@ DATALOADER:
 
 SOLVER:
   OPTIMIZER_NAME: 'SGD'
-  MAX_EPOCHS: 1 
+  MAX_EPOCHS: 120 
   BASE_LR: 0.01
-  IMS_PER_BATCH: 64
+  IMS_PER_BATCH: 256 
   WARMUP_METHOD: 'linear'
   LARGE_FC_LR: False
   CHECKPOINT_PERIOD: 120
