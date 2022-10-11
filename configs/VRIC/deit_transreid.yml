@@ -27,7 +27,7 @@ INPUT:
 
 DATASETS:
   NAMES: ('vric')
-  ROOT_DIR: ('data')
+  ROOT_DIR: ('/content/data')
 
 DATALOADER:
   SAMPLER: 'softmax_triplet'
