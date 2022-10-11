@@ -43,9 +43,9 @@ def do_train(cfg,
     scaler = amp.GradScaler()
 
     try:
-        experiment_id = mlflow.create_experiment(cfg.EXPERIMENT_NAME)
+        experiment_id = mlflow.create_experiment(cfg.MODEL.EXPERIMENT_NAME)
     except:
-        current_experiment = dict(mlflow.get_experiment_by_name(cfg.EXPERIMENT_NAME))
+        current_experiment = dict(mlflow.get_experiment_by_name(cfg.MODEL.EXPERIMENT_NAME))
         experiment_id = current_experiment['experiment_id']
 
     # train
