@@ -1,5 +1,5 @@
 import glob
-import re 
+import re
 import os.path as osp
 
 from .bases import BaseImageDataset
@@ -93,7 +93,7 @@ class VRIC(BaseImageDataset):
             raise RuntimeError("'{}' is not available".format(self.gallery_dir))
 
     def _process_dir(self, dir_path, relabel=False):
-        img_paths = glob.glob(osp.join(dir_path, '*.jpg'))[:1000]
+        img_paths = glob.glob(osp.join(dir_path, '*.jpg'))[:2000]
 
         if relabel:
             pid_container = set()

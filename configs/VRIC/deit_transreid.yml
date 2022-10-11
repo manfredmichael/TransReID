@@ -27,7 +27,7 @@ INPUT:
 
 DATASETS:
   NAMES: ('vric')
-  ROOT_DIR: ('/content/data')
+  ROOT_DIR: ("/content/data")
 
 DATALOADER:
   SAMPLER: 'softmax_triplet'
@@ -38,7 +38,7 @@ SOLVER:
   OPTIMIZER_NAME: 'SGD'
   MAX_EPOCHS: 120
   BASE_LR: 0.01
-  IMS_PER_BATCH: 2 
+  IMS_PER_BATCH: 64 
   WARMUP_METHOD: 'linear'
   LARGE_FC_LR: False
   CHECKPOINT_PERIOD: 120
