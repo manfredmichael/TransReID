@@ -7,6 +7,7 @@ from utils.meter import AverageMeter
 from utils.metrics import R1_mAP_eval
 from torch.cuda import amp
 import torch.distributed as dist
+import config
 
 import mlflow
 
@@ -47,6 +48,11 @@ def do_train(cfg,
     except:
         current_experiment = dict(mlflow.get_experiment_by_name(cfg.MODEL.EXPERIMENT_NAME))
         experiment_id = current_experiment['experiment_id']
+
+    params = config.get_model_hyperparameters(cfg)
+    mlflow.log_params(params)
+
+    mlflow.pytorch.log_model(model, cfg.MODEL.PRETRAIN_PATH)
 
     # train
     steps = 0
@@ -130,6 +136,8 @@ def do_train(cfg,
                         cmc, mAP, _, _, _, _, _ = evaluator.compute()
                         logger.info("Validation Results - Epoch: {}".format(epoch))
                         logger.info("mAP: {:.1%}".format(mAP))
+                        mlflow.log_metric(key="val/CMC", value=cmc, step=steps)
+                        mlflow.log_metric(key="val/mAP", value=mAP, step=steps)
                         for r in [1, 5, 10]:
                             logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
                         torch.cuda.empty_cache()
@@ -145,9 +153,15 @@ def do_train(cfg,
                     cmc, mAP, _, _, _, _, _ = evaluator.compute()
                     logger.info("Validation Results - Epoch: {}".format(epoch))
                     logger.info("mAP: {:.1%}".format(mAP))
+                    mlflow.log_metric(key="val/CMC", value=cmc, step=steps)
+                    mlflow.log_metric(key="val/mAP", value=mAP, step=steps)
                     for r in [1, 5, 10]:
                         logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
                     torch.cuda.empty_cache()
+
+        mlflow.pytorch.log_model(model, "barely_trained_model")
+        mlflow.end_run()
+
 
 
 def do_inference(cfg,
