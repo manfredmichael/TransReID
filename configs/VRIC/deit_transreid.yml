@@ -15,7 +15,7 @@ MODEL:
   JPM: True
   SHIFT_NUM: 8
   RE_ARRANGE: True
-  EXPERIMENT_NAME: 'Small-deit-experiment'
+  EXPERIMENT_NAME: 'Small-deit-experiment-2'
 
 INPUT:
   SIZE_TRAIN: [256, 256]
