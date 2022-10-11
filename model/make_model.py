@@ -412,17 +412,6 @@ class build_transformer_local(pl.LightningModule):
 
         return loss
 
-     def validation_step(self, batch, batch_idx):
-        if self.cfg.MODEL.DIST_TRAIN:
-            if dist.get_rank() != 0:
-                return
-        img, vid, camid, camids, target_view, _ = batch
-        feat = self(img, cam_label=camids, view_label=target_view)
-        self.evaluator.update((feat, vid, camid))
-        cmc, mAP, _, _, _, _, _ = self.evaluator.compute()
-        self.log("CMC", cmc)
-        self.log("mAP", mAP)
-
     def configure_optimizers(self):
         optimizer, optimizer_center = make_optimizer(self.cfg, self, self.center_criterion)
         return optimizer
