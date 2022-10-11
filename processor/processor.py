@@ -45,7 +45,7 @@ def do_train(cfg,
     # train
 
     # Initialize a trainer
-    trainer = pl.Trainer(max_epochs=20, progress_bar_refresh_rate=20)
+    trainer = pl.Trainer(max_epochs=20)
 
     # Auto log all MLflow entities
     mlflow.pytorch.autolog()
