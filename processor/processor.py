@@ -8,9 +8,6 @@ from utils.metrics import R1_mAP_eval
 from torch.cuda import amp
 import torch.distributed as dist
 
-import mlflow
-import pytorch_lightning as pl
-
 def do_train(cfg,
              model,
              center_criterion,
@@ -25,13 +22,13 @@ def do_train(cfg,
     checkpoint_period = cfg.SOLVER.CHECKPOINT_PERIOD
     eval_period = cfg.SOLVER.EVAL_PERIOD
 
-    device = cfg.MODEL.DEVICE 
+    device = "cuda"
     epochs = cfg.SOLVER.MAX_EPOCHS
 
     logger = logging.getLogger("transreid.train")
     logger.info('start training')
     _LOCAL_PROCESS_GROUP = None
-    if device == 'cuda' :
+    if device:
         model.to(local_rank)
         if torch.cuda.device_count() > 1 and cfg.MODEL.DIST_TRAIN:
             print('Using {} GPUs for training'.format(torch.cuda.device_count()))
@@ -43,27 +40,13 @@ def do_train(cfg,
     evaluator = R1_mAP_eval(num_query, max_rank=50, feat_norm=cfg.TEST.FEAT_NORM)
     scaler = amp.GradScaler()
     # train
-
-    # Initialize a trainer
-    trainer = pl.Trainer(max_epochs=20, progress_bar_refresh_rate=20)
-
-    # Auto log all MLflow entities
-    mlflow.pytorch.autolog()
-
-    # Train the model
-    with mlflow.start_run() as run:
-        trainer.fit(model, train_loader)
-
     for epoch in range(1, epochs + 1):
-        logger.info(f'epoch {epoch}')
         start_time = time.time()
         loss_meter.reset()
         acc_meter.reset()
         evaluator.reset()
         scheduler.step(epoch)
         model.train()
-        print('len', len(train_loader))
-        n_iter = 0
         for n_iter, (img, vid, target_cam, target_view) in enumerate(train_loader):
             optimizer.zero_grad()
             optimizer_center.zero_grad()
@@ -154,7 +137,7 @@ def do_inference(cfg,
                  model,
                  val_loader,
                  num_query):
-    device = cfg.MODEL.DEVICE 
+    device = "cuda"
     logger = logging.getLogger("transreid.test")
     logger.info("Enter inferencing")
 

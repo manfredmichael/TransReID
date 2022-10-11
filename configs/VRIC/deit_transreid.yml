@@ -6,9 +6,7 @@ MODEL:
   IF_WITH_CENTER: 'no'
   NAME: 'transformer'
   NO_MARGIN: True
-  DEVICE: "cuda"
   DEVICE_ID: ('4')
-  USE_GPU: True 
   TRANSFORMER_TYPE: 'vit_base_patch16_224_TransReID'
   STRIDE_SIZE: [16, 16]
   SIE_CAMERA: True
@@ -27,7 +25,7 @@ INPUT:
 
 DATASETS:
   NAMES: ('vric')
-  ROOT_DIR: ("/content/data")
+  ROOT_DIR: ('data')
 
 DATALOADER:
   SAMPLER: 'softmax_triplet'
@@ -38,7 +36,7 @@ SOLVER:
   OPTIMIZER_NAME: 'SGD'
   MAX_EPOCHS: 120
   BASE_LR: 0.01
-  IMS_PER_BATCH: 64 
+  IMS_PER_BATCH: 64
   WARMUP_METHOD: 'linear'
   LARGE_FC_LR: False
   CHECKPOINT_PERIOD: 120

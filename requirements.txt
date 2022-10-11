@@ -3,4 +3,3 @@ torchvision
 timm
 yacs
 opencv-python
-pytorch-lightning

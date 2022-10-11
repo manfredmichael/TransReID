@@ -5,12 +5,6 @@ import copy
 from .backbones.vit_pytorch import vit_base_patch16_224_TransReID, vit_small_patch16_224_TransReID, deit_small_patch16_224_TransReID
 from loss.metric_learning import Arcface, Cosface, AMSoftmax, CircleLoss
 
-import torch.distributed as dist
-import pytorch_lightning as pl
-from solver import make_optimizer
-from utils.metrics import R1_mAP_eval
-from loss import make_loss
-
 def shuffle_unit(features, shift, group, begin=1):
 
     batchsize = features.size(0)
@@ -18,7 +12,7 @@ def shuffle_unit(features, shift, group, begin=1):
     # Shift Operation
     feature_random = torch.cat([features[:, begin-1+shift:], features[:, begin:begin-1+shift]], dim=1)
     x = feature_random
-    # Patch 1huffle Operation
+    # Patch Shuffle Operation
     try:
         x = x.view(batchsize, group, -1, dim)
     except:
@@ -218,7 +212,7 @@ class build_transformer(nn.Module):
         print('Loading pretrained model for finetuning from {}'.format(model_path))
 
 
-class build_transformer_local(pl.LightningModule):
+class build_transformer_local(nn.Module):
     def __init__(self, num_classes, camera_num, view_num, cfg, factory, rearrange):
         super(build_transformer_local, self).__init__()
         model_path = cfg.MODEL.PRETRAIN_PATH
@@ -227,8 +221,6 @@ class build_transformer_local(pl.LightningModule):
         self.neck = cfg.MODEL.NECK
         self.neck_feat = cfg.TEST.NECK_FEAT
         self.in_planes = 768
-       
-        self.cfg = cfg
 
         print('using Transformer_type: {} as a backbone'.format(cfg.MODEL.TRANSFORMER_TYPE))
 
@@ -377,10 +369,6 @@ class build_transformer_local(pl.LightningModule):
             else:
                 return torch.cat(
                     [global_feat, local_feat_1 / 4, local_feat_2 / 4, local_feat_3 / 4, local_feat_4 / 4], dim=1)
-
-    def configure_optimizers(self):
-        optimizer, optimizer_center = make_optimizer(self.cfg, self, self.center_criterion)
-        return optimizer
 
     def load_param(self, trained_path):
         param_dict = torch.load(trained_path)
