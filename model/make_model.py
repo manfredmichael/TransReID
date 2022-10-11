@@ -218,7 +218,7 @@ class build_transformer(nn.Module):
         print('Loading pretrained model for finetuning from {}'.format(model_path))
 
 
-class build_transformer_local(pl.LightningModule):
+class build_transformer_local(nn.Module):
     def __init__(self, num_classes, camera_num, view_num, cfg, factory, rearrange, num_query):
         super(build_transformer_local, self).__init__()
         model_path = cfg.MODEL.PRETRAIN_PATH
