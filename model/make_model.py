@@ -5,12 +5,6 @@ import copy
 from .backbones.vit_pytorch import vit_base_patch16_224_TransReID, vit_small_patch16_224_TransReID, deit_small_patch16_224_TransReID
 from loss.metric_learning import Arcface, Cosface, AMSoftmax, CircleLoss
 
-import torch.distributed as dist
-import pytorch_lightning as pl
-from solver import make_optimizer
-from utils.metrics import R1_mAP_eval
-from loss import make_loss
-
 def shuffle_unit(features, shift, group, begin=1):
 
     batchsize = features.size(0)
@@ -18,7 +12,7 @@ def shuffle_unit(features, shift, group, begin=1):
     # Shift Operation
     feature_random = torch.cat([features[:, begin-1+shift:], features[:, begin:begin-1+shift]], dim=1)
     x = feature_random
-    # Patch 1huffle Operation
+    # Patch Shuffle Operation
     try:
         x = x.view(batchsize, group, -1, dim)
     except:
@@ -219,7 +213,7 @@ class build_transformer(nn.Module):
 
 
 class build_transformer_local(nn.Module):
-    def __init__(self, num_classes, camera_num, view_num, cfg, factory, rearrange, num_query):
+    def __init__(self, num_classes, camera_num, view_num, cfg, factory, rearrange):
         super(build_transformer_local, self).__init__()
         model_path = cfg.MODEL.PRETRAIN_PATH
         pretrain_choice = cfg.MODEL.PRETRAIN_CHOICE
@@ -227,10 +221,6 @@ class build_transformer_local(nn.Module):
         self.neck = cfg.MODEL.NECK
         self.neck_feat = cfg.TEST.NECK_FEAT
         self.in_planes = 768
-       
-        self.cfg = cfg
-        self.loss_func, self.center_criterion = make_loss(self.cfg, num_classes=num_classes)
-        self.evaluator = R1_mAP_eval(num_query, max_rank=50, feat_norm=cfg.TEST.FEAT_NORM)
 
         print('using Transformer_type: {} as a backbone'.format(cfg.MODEL.TRANSFORMER_TYPE))
 
@@ -380,53 +370,6 @@ class build_transformer_local(nn.Module):
                 return torch.cat(
                     [global_feat, local_feat_1 / 4, local_feat_2 / 4, local_feat_3 / 4, local_feat_4 / 4], dim=1)
 
-    def training_step(self, batch, batch_nb):
-        img, pid, target_cam, target_view = batch
-        # logger.info(f'n_iter {n_iter}')
-        # optimizer.zero_grad()
-        # optimizer_center.zero_grad()
-        # img = img.to(device)
-        # target = vid.to(device)
-        # target_cam = target_cam.to(device)
-        # target_view = target_view.to(device)
-
-        score, feat = self(img, pid, cam_label=target_cam, view_label=target_view)
-        loss = self.loss_func(score, feat, pid, target_cam)
-
-
-        if isinstance(score, list):
-            acc = (score[0].max(1)[1] == pid).float().mean()
-        else:
-            acc = (score.max(1)[1] == pid).float().mean()
-
-        self.log("accuracy", acc, on_epoch=True)
-
-        # loss_meter.update(loss.item(), img.shape[0])
-        # acc_meter.update(acc, 1)
-
-        # torch.cuda.synchronize()
-        # if (n_iter + 1) % log_period == 0:
-        #     logger.info("Epoch[{}] Iteration[{}/{}] Loss: {:.3f}, Acc: {:.3f}, Base Lr: {:.2e}"
-        #                 .format(epoch, (n_iter + 1), len(train_loader),
-        #                         loss_meter.avg, acc_meter.avg, scheduler._get_lr(epoch)[0]))
-
-        return loss
-
-    def validation_step(self, batch, batch_idx):
-        if self.cfg.MODEL.DIST_TRAIN:
-            if dist.get_rank() != 0:
-                return
-        img, vid, camid, camids, target_view, _ = batch
-        feat = self(img, cam_label=camids, view_label=target_view)
-        self.evaluator.update((feat, vid, camid))
-        cmc, mAP, _, _, _, _, _ = self.evaluator.compute()
-        self.log("CMC", cmc)
-        self.log("mAP", mAP)
-
-    def configure_optimizers(self):
-        optimizer, optimizer_center = make_optimizer(self.cfg, self, self.center_criterion)
-        return optimizer
-
     def load_param(self, trained_path):
         param_dict = torch.load(trained_path)
         for i in param_dict:
@@ -447,10 +390,10 @@ __factory_T_type = {
     'deit_small_patch16_224_TransReID': deit_small_patch16_224_TransReID
 }
 
-def make_model(cfg, num_class, camera_num, view_num, num_query):
+def make_model(cfg, num_class, camera_num, view_num):
     if cfg.MODEL.NAME == 'transformer':
         if cfg.MODEL.JPM:
-            model = build_transformer_local(num_class, camera_num, view_num, cfg, __factory_T_type, rearrange=cfg.MODEL.RE_ARRANGE, num_query=num_query)
+            model = build_transformer_local(num_class, camera_num, view_num, cfg, __factory_T_type, rearrange=cfg.MODEL.RE_ARRANGE)
             print('===========building transformer with JPM module ===========')
         else:
             model = build_transformer(num_class, camera_num, view_num, cfg, __factory_T_type)
