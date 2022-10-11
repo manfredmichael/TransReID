@@ -15,6 +15,7 @@ MODEL:
   JPM: True
   SHIFT_NUM: 8
   RE_ARRANGE: True
+  EXPERIMENT_NAME: 'TransReID-VERI-Experiment'
 
 INPUT:
   SIZE_TRAIN: [256, 256]
