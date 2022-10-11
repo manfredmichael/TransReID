@@ -219,7 +219,7 @@ class build_transformer(nn.Module):
 
 
 class build_transformer_local(pl.LightningModule):
-    def __init__(self, num_classes, camera_num, view_num, cfg, factory, rearrange):
+    def __init__(self, num_classes, camera_num, view_num, cfg, factory, rearrange, num_query):
         super(build_transformer_local, self).__init__()
         model_path = cfg.MODEL.PRETRAIN_PATH
         pretrain_choice = cfg.MODEL.PRETRAIN_CHOICE
