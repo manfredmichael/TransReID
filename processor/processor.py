@@ -45,9 +45,12 @@ def do_train(cfg,
 
     try:
         experiment_id = mlflow.create_experiment(cfg.MODEL.EXPERIMENT_NAME)
+        logger.info('new experiment created!')
     except:
+        logger.info('experiment already exist!')
         current_experiment = dict(mlflow.get_experiment_by_name(cfg.MODEL.EXPERIMENT_NAME))
         experiment_id = current_experiment['experiment_id']
+        logger.info('experiment loaded!')
 
 
     params = config.get_model_hyperparameters(cfg)
