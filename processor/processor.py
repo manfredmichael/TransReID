@@ -31,11 +31,11 @@ def do_train(cfg,
     logger = logging.getLogger("transreid.train")
     logger.info('start training')
     _LOCAL_PROCESS_GROUP = None
-    # if device == 'cuda' :
-    #     model.to(local_rank)
-    #     if torch.cuda.device_count() > 1 and cfg.MODEL.DIST_TRAIN:
-    #         print('Using {} GPUs for training'.format(torch.cuda.device_count()))
-    #         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[local_rank], find_unused_parameters=True)
+    if device == 'cuda' :
+        model.to(local_rank)
+        if torch.cuda.device_count() > 1 and cfg.MODEL.DIST_TRAIN:
+            print('Using {} GPUs for training'.format(torch.cuda.device_count()))
+            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[local_rank], find_unused_parameters=True)
 
     loss_meter = AverageMeter()
     acc_meter = AverageMeter()
