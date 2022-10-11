@@ -61,10 +61,7 @@ def do_train(cfg,
 
     # train
     steps = 0
-    logger.info('starting run')
-    print(experiment_id)
-    with mlflow.start_run():
-        logger.info('run started')
+    with mlflow.start_run(experiment_id=experiment_id, nested=True):
         for epoch in range(1, epochs + 1):
             start_time = time.time()
             loss_meter.reset()
