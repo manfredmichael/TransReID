@@ -49,6 +49,8 @@ def do_train(cfg,
         current_experiment = dict(mlflow.get_experiment_by_name(cfg.MODEL.EXPERIMENT_NAME))
         experiment_id = current_experiment['experiment_id']
 
+    mlflow.end_run()
+
     params = config.get_model_hyperparameters(cfg)
     mlflow.log_params(params)
 
