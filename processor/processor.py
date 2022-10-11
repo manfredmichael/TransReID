@@ -85,6 +85,10 @@ def do_train(cfg,
                 print(len(target))
                 print(len(target_cam))
                 print(len(target_view))
+                print(img.shape)
+                print(target.shape)
+                print(target_cam.shape)
+                print(target_view.shape)
                 with amp.autocast(enabled=True):
                     score, feat = model(img, target, cam_label=target_cam, view_label=target_view )
                     loss = loss_fn(score, feat, target, target_cam)

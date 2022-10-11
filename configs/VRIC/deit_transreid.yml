@@ -6,9 +6,9 @@ MODEL:
   IF_WITH_CENTER: 'no'
   NAME: 'transformer'
   NO_MARGIN: True
-  DEVICE: "cpu"
+  DEVICE: "cuda"
   DEVICE_ID: ('4')
-  USE_GPU: False 
+  USE_GPU: True 
   TRANSFORMER_TYPE: 'vit_base_patch16_224_TransReID'
   STRIDE_SIZE: [16, 16]
   SIE_CAMERA: True
