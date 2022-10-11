@@ -1,5 +1,6 @@
 import glob
-import re import os.path as osp
+import re 
+import os.path as osp
 
 from .bases import BaseImageDataset
 
