@@ -447,10 +447,10 @@ __factory_T_type = {
     'deit_small_patch16_224_TransReID': deit_small_patch16_224_TransReID
 }
 
-def make_model(cfg, num_class, camera_num, view_num):
+def make_model(cfg, num_class, camera_num, view_num, num_query):
     if cfg.MODEL.NAME == 'transformer':
         if cfg.MODEL.JPM:
-            model = build_transformer_local(num_class, camera_num, view_num, cfg, __factory_T_type, rearrange=cfg.MODEL.RE_ARRANGE)
+            model = build_transformer_local(num_class, camera_num, view_num, cfg, __factory_T_type, rearrange=cfg.MODEL.RE_ARRANGE, num_query=num_query)
             print('===========building transformer with JPM module ===========')
         else:
             model = build_transformer(num_class, camera_num, view_num, cfg, __factory_T_type)
