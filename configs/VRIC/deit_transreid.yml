@@ -1,13 +1,13 @@
 MODEL:
   PRETRAIN_CHOICE: 'imagenet'
-  PRETRAIN_PATH: 'checkpoints/vit_small_p16_224-15ec54c9.pth'
+  PRETRAIN_PATH: 'checkpoints/deit_base_distilled_patch16_224.pth'
   METRIC_LOSS_TYPE: 'triplet'
   IF_LABELSMOOTH: 'off'
   IF_WITH_CENTER: 'no'
   NAME: 'transformer'
   NO_MARGIN: True
   DEVICE_ID: ('4')
-  TRANSFORMER_TYPE: 'vit_small_patch16_224_TransReID'
+  TRANSFORMER_TYPE: 'vit_base_patch16_224_TransReID'
   STRIDE_SIZE: [16, 16]
   SIE_CAMERA: True
   SIE_VIEW: False 
