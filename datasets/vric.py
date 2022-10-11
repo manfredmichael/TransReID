@@ -120,7 +120,7 @@ class VRIC(BaseImageDataset):
             camid -= 1  # index starts from 0
             if relabel: pid = pid2label[pid]
 
-            dataset.append((img_path, pid, camid, 0))
+            dataset.append((img_path, pid, camid, 1))
         print(count, 'samples without annotations')
         print('camid container', camid_container)
         return dataset
