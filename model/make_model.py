@@ -412,7 +412,7 @@ class build_transformer_local(pl.LightningModule):
 
         return loss
 
-     def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch, batch_idx):
         if self.cfg.MODEL.DIST_TRAIN:
             if dist.get_rank() != 0:
                 return
