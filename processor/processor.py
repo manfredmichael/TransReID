@@ -55,8 +55,12 @@ def do_train(cfg,
     #     trainer.fit(model, train_loader)
 
     steps = 0
-    experiment_id = mlflow.create_experiment("Transreid-VRIC")
-    
+    try:
+        experiment_id = mlflow.create_experiment(cfg.EXPERIMENT.NAME)
+    except:
+        current_experiment = dict(mlflow.get_experiment_by_name(cfg.EXPERIMENT.NAME))
+        experiment_id = current_experiment['experiment_id']
+
     with mlflow.start_run(experiment_id=experiment_id) as run:
         for epoch in range(1, epochs + 1):
             logger.info(f'epoch {epoch}')

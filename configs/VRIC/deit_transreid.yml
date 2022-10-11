@@ -56,6 +56,9 @@ TEST:
   NECK_FEAT: 'before'
   FEAT_NORM: 'yes'
 
+EXPERIMENT:
+  NAME: 'TransReID-VRIC-Experiment'
+
 OUTPUT_DIR: '../logs/veri_deit_transreid'
 
 
