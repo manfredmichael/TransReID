@@ -134,28 +134,27 @@ def do_train(cfg,
                     if dist.get_rank() != 0:
                         continue
                 # model.eval()
-                acc_ = []
+                # acc_ = []
                 for n_iter, (img, target, vid, camid, camids, target_view, _) in enumerate(val_loader):
                     with torch.no_grad():
                         img = img.to(device)
                         target = target.to(device)
                         camids = camids.to(device)
                         target_view = target_view.to(device)
-                        # feat, score = model(img, cam_label=camids, view_label=target_view)
-                        score, feat, global_feat = model(img, target, cam_label=camids, view_label=target_view )
-                        evaluator.update((global_feat, vid, camid))
-                        if isinstance(score, list):
-                            acc = (score[0].max(1)[1] == target).float().mean()
-                        else:
-                            acc = (score.max(1)[1] == target).float().mean()
-                        acc_.append(acc)
+                        feat = model(img, cam_label=camids, view_label=target_view)
+                        evaluator.update((feat, vid, camid))
+                        # if isinstance(score, list):
+                        #     acc = (score[0].max(1)[1] == target).float().mean()
+                        # else:
+                        #     acc = (score.max(1)[1] == target).float().mean()
+                        # acc_.append(acc)
                 cmc, mAP, _, _, _, _, _ = evaluator.compute()
-                acc_ = sum(acc_)/len(acc_)
+                # acc_ = sum(acc_)/len(acc_)
                 logger.info("Validation Results - Epoch: {}".format(epoch))
                 logger.info("mAP: {:.1%}".format(mAP))
                 mlflow.log_metric(key="val/CMC", value=cmc, step=steps)
                 mlflow.log_metric(key="val/mAP", value=mAP, step=steps)
-                mlflow.log_metric(key="val/acc", value=acc_, step=steps)
+                # mlflow.log_metric(key="val/acc", value=acc_, step=steps)
                 for r in [1, 5, 10]:
                     logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
                 torch.cuda.empty_cache()
