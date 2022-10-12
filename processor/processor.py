@@ -141,7 +141,8 @@ def do_train(cfg,
                         target = target.to(device)
                         camids = camids.to(device)
                         target_view = target_view.to(device)
-                        score, feat, global_feat = model(img, target, cam_label=target_cam, view_label=target_view )
+                        # feat, score = model(img, cam_label=camids, view_label=target_view)
+                        score, feat, global_feat = model(img, target, cam_label=camids, view_label=target_view )
                         evaluator.update((global_feat, vid, camid))
                         if isinstance(score, list):
                             acc = (score[0].max(1)[1] == target).float().mean()
