@@ -152,7 +152,7 @@ def do_train(cfg,
                 # acc_ = sum(acc_)/len(acc_)
                 logger.info("Validation Results - Epoch: {}".format(epoch))
                 logger.info("mAP: {:.1%}".format(mAP))
-                mlflow.log_metric(key="val/CMC", value=cmc, step=steps)
+                # mlflow.log_metric(key="val/CMC", value=cmc, step=steps)
                 mlflow.log_metric(key="val/mAP", value=mAP, step=steps)
                 # mlflow.log_metric(key="val/acc", value=acc_, step=steps)
                 for r in [1, 5, 10]:
