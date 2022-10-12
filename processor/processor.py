@@ -80,7 +80,7 @@ def do_train(cfg,
                 target_cam = target_cam.to(device)
                 target_view = target_view.to(device)
                 with amp.autocast(enabled=True):
-                    score, feat, global_feat = model(img, target, cam_label=target_cam, view_label=target_view )
+                    score, feat = model(img, target, cam_label=target_cam, view_label=target_view )
                     loss = loss_fn(score, feat, target, target_cam)
 
                 scaler.scale(loss).backward()
@@ -133,7 +133,7 @@ def do_train(cfg,
                 if cfg.MODEL.DIST_TRAIN:
                     if dist.get_rank() != 0:
                         continue
-                # model.eval()
+                model.eval()
                 # acc_ = []
                 for n_iter, (img, target, vid, camid, camids, target_view, _) in enumerate(val_loader):
                     with torch.no_grad():

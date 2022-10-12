@@ -361,8 +361,7 @@ class build_transformer_local(nn.Module):
             return [cls_score, cls_score_1, cls_score_2, cls_score_3,
                         cls_score_4
                         ], [global_feat, local_feat_1, local_feat_2, local_feat_3,
-                            local_feat_4], torch.cat(
-                    [global_feat, local_feat_1 / 4, local_feat_2 / 4, local_feat_3 / 4, local_feat_4 / 4], dim=1)# global feature for triplet loss
+                            local_feat_4]
         else:
             if self.neck_feat == 'after':
                 return torch.cat(
