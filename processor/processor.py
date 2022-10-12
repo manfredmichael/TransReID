@@ -67,9 +67,9 @@ def do_train(cfg,
             acc_meter.reset()
             evaluator.reset()
             scheduler.step(epoch)
-            model.train()
             logger.info("epoch")
             for n_iter, (img, vid, target_cam, target_view) in enumerate(train_loader):
+                model.train()
                 start_time = time.time()
                 steps+=1
 
