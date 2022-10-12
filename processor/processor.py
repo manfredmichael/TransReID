@@ -135,18 +135,18 @@ def do_train(cfg,
                         continue
                 # model.eval()
                 acc_ = []
-                for n_iter, (img, vid, camid, camids, target_view, _) in enumerate(val_loader):
+                for n_iter, (img, target, vid, camid, camids, target_view, _) in enumerate(val_loader):
                     with torch.no_grad():
                         img = img.to(device)
-                        vid = vid.to(device)
+                        target = target.to(device)
                         camids = camids.to(device)
                         target_view = target_view.to(device)
                         feat, score = model(img, cam_label=camids, view_label=target_view)
                         evaluator.update((feat, vid, camid))
                         if isinstance(score, list):
-                            acc = (score[0].max(1)[1] == vid).float().mean()
+                            acc = (score[0].max(1)[1] == target).float().mean()
                         else:
-                            acc = (score.max(1)[1] == vid).float().mean()
+                            acc = (score.max(1)[1] == target).float().mean()
                         acc_.append(acc)
                 cmc, mAP, _, _, _, _, _ = evaluator.compute()
                 acc_ = sum(acc_)/len(acc_)
