@@ -80,8 +80,7 @@ def do_train(cfg,
                 target_cam = target_cam.to(device)
                 target_view = target_view.to(device)
                 with amp.autocast(enabled=True):
-                    score, feat = model(img, target, cam_label=target_cam, view_label=target_view )
-                    print('feat', feat)
+                    score, feat, global_feat = model(img, target, cam_label=target_cam, view_label=target_view )
                     loss = loss_fn(score, feat, target, target_cam)
 
                 scaler.scale(loss).backward()
@@ -142,9 +141,8 @@ def do_train(cfg,
                         target = target.to(device)
                         camids = camids.to(device)
                         target_view = target_view.to(device)
-                        feat, score = model(img, cam_label=camids, view_label=target_view)
-                        print('feat eval', feat)
-                        evaluator.update((feat, vid, camid))
+                        score, feat, global_feat = model(img, target, cam_label=target_cam, view_label=target_view )
+                        evaluator.update((global_feat, vid, camid))
                         if isinstance(score, list):
                             acc = (score[0].max(1)[1] == target).float().mean()
                         else:
